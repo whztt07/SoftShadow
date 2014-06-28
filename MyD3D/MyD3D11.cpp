@@ -204,7 +204,7 @@ void PopFileInitialize(HWND hwnd)
 	ofn.nMaxFile = MAX_PATH;
 	ofn.lpstrFileTitle = NULL;                 
 	ofn.nMaxFileTitle = MAX_PATH;
-	ofn.lpstrInitialDir = NULL;
+	ofn.lpstrInitialDir = L".\\Media";
 	ofn.lpstrTitle = L"Open Model File";
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_ALLOWMULTISELECT | OFN_EXPLORER;
 	ofn.nFileOffset = 0;

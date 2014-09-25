@@ -8,6 +8,7 @@
 #include <windows.h>
 #include "resource.h"
 #include "MyD3Ddevice.h"
+#include "MyObjLoader.h"
 
 
 //--------------------------------------------------------------------------------------
@@ -26,7 +27,7 @@ HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow );
 LRESULT CALLBACK    WndProc( HWND, UINT, WPARAM, LPARAM );
 BOOL    CALLBACK    AboutDlgProc(HWND, UINT, WPARAM, LPARAM);
 
-void PopFileInitialize(HWND);
+void PopFileInitialize(HWND, char*);
 
 
 //--------------------------------------------------------------------------------------
@@ -117,12 +118,13 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
     HDC hdc;
 
 	static HINSTANCE hInstance;
+    static char szFilename[MAX_PATH] = {'\0'};
 
     switch( message )
     {
 		case WM_CREATE:
 			hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
-			PopFileInitialize(hWnd);
+			PopFileInitialize(hWnd,szFilename);
 			break;
 		case WM_PAINT:
             hdc = BeginPaint( hWnd, &ps );
@@ -186,7 +188,7 @@ BOOL CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-void PopFileInitialize(HWND hwnd)
+void PopFileInitialize(HWND hwnd, char* szFilename)
 {
 
 	static TCHAR szFilter[] = L"OBJ Files (*.OBJ)\0*.obj\0"  \
@@ -200,7 +202,7 @@ void PopFileInitialize(HWND hwnd)
 	ofn.lpstrCustomFilter = NULL;
 	ofn.nMaxCustFilter = 0;
 	ofn.nFilterIndex = 0;
-	ofn.lpstrFile = NULL;             
+	ofn.lpstrFile = szFilename;             
 	ofn.nMaxFile = MAX_PATH;
 	ofn.lpstrFileTitle = NULL;                 
 	ofn.nMaxFileTitle = MAX_PATH;

@@ -190,16 +190,16 @@ HRESULT MyD3Ddevice::InitDevice(HWND g_hWnd)
 		return hr;
 
 	// Create vertex buffer
-	SimpleVertex vertices[] =
+	float3 vertices[] =
 	{
-		DirectX::XMFLOAT3(0.0f, 0.5f, 0.5f),
-		DirectX::XMFLOAT3(0.5f, -0.5f, 0.5f),
-		DirectX::XMFLOAT3(-0.5f, -0.5f, 0.5f),
+		float3(0.0f, 0.5f, 0.5f),
+		float3(0.5f, -0.5f, 0.5f),
+		float3(-0.5f, -0.5f, 0.5f),
 	};
 	D3D11_BUFFER_DESC bd;
 	ZeroMemory(&bd, sizeof(bd));
 	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.ByteWidth = sizeof(SimpleVertex)* 3;
+	bd.ByteWidth = sizeof(float3)* 3;
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.CPUAccessFlags = 0;
 	D3D11_SUBRESOURCE_DATA InitData;
@@ -210,7 +210,7 @@ HRESULT MyD3Ddevice::InitDevice(HWND g_hWnd)
 		return hr;
 
 	// Set vertex buffer
-	UINT stride = sizeof(SimpleVertex);
+	UINT stride = sizeof(float3);
 	UINT offset = 0;
 	g_pImmediateContext->IASetVertexBuffers(0, 1, &g_pVertexBuffer, &stride, &offset);
 

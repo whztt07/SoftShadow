@@ -79,6 +79,7 @@
   <ItemGroup>
     <ClCompile Include="MyD3D11.cpp" />
     <ClCompile Include="MyD3Ddevice.cpp" />
+    <ClCompile Include="MyObjLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MyD3D11.rc" />
@@ -86,6 +87,7 @@
   <ItemGroup>
     <ClInclude Include="Common.h" />
     <ClInclude Include="MyD3Ddevice.h" />
+    <ClInclude Include="MyObjLoader.h" />
     <ClInclude Include="Resource.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Common.h"
 
 struct SurfaceMaterial
@@ -12,17 +14,31 @@ struct SurfaceMaterial
 class MyObjLoader
 {
 public:
-    MyObjLoader()
-    {}
+    MyObjLoader();
+    ~MyObjLoader();
+
+    void Init(ID3D11Device* d3dDevice)
+    {
+        m_pd3dDevice = d3dDevice;
+
+        meshSRV.clear();
+        textureNameArray.clear();
+    }
 
     bool LoadObjModel(bool isRHCoordSys,						//true if model was created in right hand coord system
 	                  bool computeNormals);						//true to compute the normals, false to use the files normals
 private:
+    ID3D11Device*   m_pd3dDevice;
+
+    //Textures and material variables, used for all mesh's loaded
+    std::vector<ID3D11ShaderResourceView*> meshSRV;
+    std::vector<std::wstring> textureNameArray;
+
     std::wstring filename;	                    //.obj filename
 	ID3D11Buffer** vertBuff;					//mesh vertex buffer
 	ID3D11Buffer** indexBuff;					//mesh index buffer
-	std::vector<int>& subsetIndexStart;			//start index of each subset
-	std::vector<int>& subsetMaterialArray;		//index value of material for each subset
-	std::vector<SurfaceMaterial>& material;		//vector of material structures
+	std::vector<int> subsetIndexStart;			//start index of each subset
+	std::vector<int> subsetMaterialArray;		//index value of material for each subset
+	std::vector<SurfaceMaterial> material;		//vector of material structures
 	int subsetCount;							//Number of subsets in mesh
-}
+};

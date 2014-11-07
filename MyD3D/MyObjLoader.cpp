@@ -1,5 +1,13 @@
 #include "MyObjLoader.h"
 
+MyObjLoader::MyObjLoader()
+{
+    m_pd3dDevice = NULL;
+}
+
+MyObjLoader::~MyObjLoader()
+{}
+
 bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 {
 	HRESULT hr = 0;
@@ -138,7 +146,7 @@ bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 							int whichPart = 0;		//(vPos, vTexCoord, or vNorm)
 
 							//Parse this string
-							for(int j = 0; j < VertDef.length(); ++j)
+							for(uint32 j = 0; j < VertDef.length(); ++j)
 							{
 								if(VertDef[j] != '/')	//If there is no divider "/", add a char to our vertPart
 									vertPart += VertDef[j];
@@ -269,7 +277,7 @@ bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 							int whichPart = 0;
 
 							//Parse this string (same as above)
-							for(int j = 0; j < VertDef.length(); ++j)
+							for(uint32 j = 0; j < VertDef.length(); ++j)
 							{
 								if(VertDef[j] != '/')
 									vertPart += VertDef[j];
@@ -420,7 +428,7 @@ bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 	}
 	else	//If we could not open the file
 	{
-		SwapChain->SetFullscreenState(false, NULL);	//Make sure we are out of fullscreen
+		//SwapChain->SetFullscreenState(false, NULL);	//Make sure we are out of fullscreen
 
 		//create message
 		std::wstring message = L"Could not open: ";
@@ -439,7 +447,7 @@ bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 	if(subsetIndexStart[1] == 0)
 	{
 		subsetIndexStart.erase(subsetIndexStart.begin()+1);
-		meshSubsets--;
+		subsetCount--;
 	}
 
 	//Make sure we have a default for the tex coord and normal
@@ -579,7 +587,7 @@ bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 
 									//check if this texture has already been loaded
 									bool alreadyLoaded = false;
-									for(int i = 0; i < textureNameArray.size(); ++i)
+									for(uint32 i = 0; i < textureNameArray.size(); ++i)
 									{
 										if(fileNamePath == textureNameArray[i])
 										{
@@ -592,9 +600,9 @@ bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 									//if the texture is not already loaded, load it now
 									if(!alreadyLoaded)
 									{
-										ID3D11ShaderResourceView* tempMeshSRV;
-										hr = D3DX11CreateShaderResourceViewFromFile( d3d11Device, fileNamePath.c_str(),
-											NULL, NULL, &tempMeshSRV, NULL );
+										ID3D11Resource* tempTex; 
+                                        ID3D11ShaderResourceView* tempMeshSRV;
+										hr = CreateWICTextureFromFile( m_pd3dDevice, fileNamePath.c_str(), &tempTex, &tempMeshSRV );
 										if(SUCCEEDED(hr))
 										{
 											textureNameArray.push_back(fileNamePath.c_str());
@@ -662,7 +670,7 @@ bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 	}	
 	else
 	{
-		SwapChain->SetFullscreenState(false, NULL);	//Make sure we are out of fullscreen
+		//SwapChain->SetFullscreenState(false, NULL);	//Make sure we are out of fullscreen
 
 		std::wstring message = L"Could not open: ";
 		message += meshMatLib;
@@ -675,10 +683,10 @@ bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 
 	//Set the subsets material to the index value
 	//of the its material in our material array
-	for(int i = 0; i < meshSubsets; ++i)
+	for(int i = 0; i < subsetCount; ++i)
 	{
 		bool hasMat = false;
-		for(int j = 0; j < material.size(); ++j)
+		for(uint32 j = 0; j < material.size(); ++j)
 		{
 			if(meshMaterials[i] == material[j].matName)
 			{
@@ -768,7 +776,7 @@ bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 			}
 
 			//Get the actual normal by dividing the normalSum by the number of faces sharing the vertex
-			normalSum = normalSum / facesUsing;
+			normalSum = normalSum / (float)facesUsing;
 
 			//Normalize the normalSum vector
 			normalSum = XMVector3Normalize(normalSum);
@@ -798,7 +806,7 @@ bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 	D3D11_SUBRESOURCE_DATA iinitData;
 
 	iinitData.pSysMem = &indices[0];
-	d3d11Device->CreateBuffer(&indexBufferDesc, &iinitData, indexBuff);
+	m_pd3dDevice->CreateBuffer(&indexBufferDesc, &iinitData, indexBuff);
 
 	//Create Vertex Buffer
 	D3D11_BUFFER_DESC vertexBufferDesc;
@@ -814,7 +822,7 @@ bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 
 	ZeroMemory( &vertexBufferData, sizeof(vertexBufferData) );
 	vertexBufferData.pSysMem = &vertices[0];
-	hr = d3d11Device->CreateBuffer( &vertexBufferDesc, &vertexBufferData, vertBuff);
+	hr = m_pd3dDevice->CreateBuffer( &vertexBufferDesc, &vertexBufferData, vertBuff);
 
 	return true;
 }

@@ -806,7 +806,7 @@ bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 	D3D11_SUBRESOURCE_DATA iinitData;
 
 	iinitData.pSysMem = &indices[0];
-	m_pd3dDevice->CreateBuffer(&indexBufferDesc, &iinitData, indexBuff);
+	m_pd3dDevice->CreateBuffer(&indexBufferDesc, &iinitData, &indexBuff);
 
 	//Create Vertex Buffer
 	D3D11_BUFFER_DESC vertexBufferDesc;
@@ -822,7 +822,7 @@ bool MyObjLoader::LoadObjModel(bool isRHCoordSys, bool computeNormals)
 
 	ZeroMemory( &vertexBufferData, sizeof(vertexBufferData) );
 	vertexBufferData.pSysMem = &vertices[0];
-	hr = m_pd3dDevice->CreateBuffer( &vertexBufferDesc, &vertexBufferData, vertBuff);
+	hr = m_pd3dDevice->CreateBuffer( &vertexBufferDesc, &vertexBufferData, &vertBuff);
 
 	return true;
 }

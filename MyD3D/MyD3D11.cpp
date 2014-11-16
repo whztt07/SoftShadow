@@ -8,7 +8,6 @@
 #include <windows.h>
 #include "resource.h"
 #include "MyD3Ddevice.h"
-#include "MyObjLoader.h"
 
 
 //--------------------------------------------------------------------------------------
@@ -18,6 +17,8 @@ HINSTANCE               g_hInst = NULL;
 HWND                    g_hWnd = NULL;
 
 OPENFILENAME ofn;
+
+MyD3Ddevice MyD3DRenderer;
 
 
 //--------------------------------------------------------------------------------------
@@ -38,8 +39,6 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 {
 	UNREFERENCED_PARAMETER( hPrevInstance );
     UNREFERENCED_PARAMETER( lpCmdLine );
-
-	MyD3Ddevice MyD3DRenderer;
 
     if( FAILED( InitWindow( hInstance, nCmdShow ) ) )
         return 0;

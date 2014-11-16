@@ -59,7 +59,7 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="MyD3D11.fx">
+    <FxCompile Include="Shaders\MyD3D11.fx">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

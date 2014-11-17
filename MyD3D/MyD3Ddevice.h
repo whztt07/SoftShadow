@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common.h"
+#include "MyObjLoader.h"
 
 typedef enum
 {
@@ -19,6 +20,7 @@ struct cbPerObject
 	//These will be used for the pixel shader
 	//XMFLOAT4 difColor;
 	bool hasTexture;
+    float3 unused;
 	///////////////**************new**************////////////////////
 };
 

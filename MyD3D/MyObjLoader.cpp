@@ -1,10 +1,5 @@
 #include "MyObjLoader.h"
 
-MyObjLoader::MyObjLoader()
-{
-    m_pd3dDevice = NULL;
-}
-
 MyObjLoader::~MyObjLoader()
 {}
 

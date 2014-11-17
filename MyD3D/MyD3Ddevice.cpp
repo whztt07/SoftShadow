@@ -50,12 +50,15 @@ HRESULT MyD3Ddevice::CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoin
 #endif
 
 	ID3DBlob* pErrorBlob;
-	hr = D3DCompileFromFile(szFileName, NULL, NULL, szEntryPoint, szShaderModel,
+	hr = D3DCompileFromFile(szFileName, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, szEntryPoint, szShaderModel,
 		dwShaderFlags, 0, ppBlobOut, &pErrorBlob);
 	if (FAILED(hr))
 	{
 		if (pErrorBlob != NULL)
-			OutputDebugStringA((char*)pErrorBlob->GetBufferPointer());
+        {
+            char* tmp = (char*)pErrorBlob->GetBufferPointer();
+			OutputDebugStringA(tmp);
+        }
 		if (pErrorBlob) pErrorBlob->Release();
 		return hr;
 	}
@@ -161,9 +164,14 @@ HRESULT MyD3Ddevice::InitDevice(HWND g_hWnd)
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
 
+    LPWSTR file = new WCHAR[MAX_PATH];
+    LPWSTR path = new WCHAR[MAX_PATH];
+    GetCurrentDirectory(MAX_PATH, path);
+    swprintf_s(file, MAX_PATH, L"%s\\Shaders\\MyD3D11.fx", path);
+
 	// Compile the default vertex shader
 	ID3DBlob* pVSBlob = NULL;
-	hr = CompileShaderFromFile(L"MyD3D11.fx", "VS", "vs_4_0", &pVSBlob);
+	hr = CompileShaderFromFile(file, "VS", "vs_5_0", &pVSBlob);
 	if (FAILED(hr))
 	{
 		MessageBox(NULL,
@@ -181,7 +189,7 @@ HRESULT MyD3Ddevice::InitDevice(HWND g_hWnd)
 
     // Compile the default pixel shader
 	ID3DBlob* pPSBlob = NULL;
-	hr = CompileShaderFromFile(L"MyD3D11.fx", "PS", "ps_4_0", &pPSBlob);
+	hr = CompileShaderFromFile(file, "PS", "ps_5_0", &pPSBlob);
 	if (FAILED(hr))
 	{
 		MessageBox(NULL,
@@ -310,7 +318,7 @@ void MyD3Ddevice::RenderMesh()
 		m_pImmediateContext->IASetIndexBuffer( ObjArray[i].indexBuff, DXGI_FORMAT_R32_UINT, 0);
 		m_pImmediateContext->IASetVertexBuffers( 0, 1, &ObjArray[i].vertBuff, &stride, &offset );
 
-        for(int iSub = 0; iSub < ; ++iSub)
+        for(int iSub = 0; iSub < ObjArray[i].subsetCount; ++iSub)
 	    {
 		    uint32 idx = ObjArray[i].subsetMaterialArray[iSub];
 

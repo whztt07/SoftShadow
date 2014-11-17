@@ -8,6 +8,7 @@
 #include <windows.h>
 #include "resource.h"
 #include "MyD3Ddevice.h"
+#include "MyObjLoader.h"
 
 
 //--------------------------------------------------------------------------------------
@@ -17,7 +18,6 @@ HINSTANCE               g_hInst = NULL;
 HWND                    g_hWnd = NULL;
 
 OPENFILENAME ofn;
-
 MyD3Ddevice MyD3DRenderer;
 
 
@@ -28,7 +28,7 @@ HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow );
 LRESULT CALLBACK    WndProc( HWND, UINT, WPARAM, LPARAM );
 BOOL    CALLBACK    AboutDlgProc(HWND, UINT, WPARAM, LPARAM);
 
-void PopFileInitialize(HWND, char*);
+void PopFileInitialize(HWND, LPWSTR);
 
 
 //--------------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
     HDC hdc;
 
 	static HINSTANCE hInstance;
-    static char szFilename[MAX_PATH] = {'\0'};
+    static WCHAR szFilename[MAX_PATH] = {'\0'};
 
     switch( message )
     {
@@ -135,6 +135,9 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 			case IDM_OPEN:
 				if (GetOpenFileName(&ofn))
 				{
+                    MyObjLoader NewOBJ(MyD3DRenderer.m_pd3dDevice, ofn.lpstrFile);
+                    NewOBJ.LoadObjModel(true, false);
+                    MyD3DRenderer.ObjArray.push_back(NewOBJ);
 				}
 				break;
 			case IDM_EXIT:
@@ -187,7 +190,7 @@ BOOL CALLBACK AboutDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 	return FALSE;
 }
 
-void PopFileInitialize(HWND hwnd, char* szFilename)
+void PopFileInitialize(HWND hwnd, LPWSTR szFilename)
 {
 
 	static TCHAR szFilter[] = L"OBJ Files (*.OBJ)\0*.obj\0"  \

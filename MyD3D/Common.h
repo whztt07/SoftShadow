@@ -12,9 +12,9 @@
 #include <istream>
 #include <sstream>
 
-#include "MyObjLoader.h"
-
 using namespace DirectX;
+
+#define MAX_PATH 260
 
 typedef unsigned int uint32; 
 

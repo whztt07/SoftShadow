@@ -14,11 +14,9 @@ struct SurfaceMaterial
 class MyObjLoader
 {
 public:
-    MyObjLoader();
-    ~MyObjLoader();
-
-    void Init(ID3D11Device* d3dDevice)
+    MyObjLoader(ID3D11Device* d3dDevice, std::wstring fname)
     {
+        filename = fname;
         m_pd3dDevice = d3dDevice;
         
         meshSRV.clear();
@@ -33,6 +31,8 @@ public:
 
         subsetCount = 0;
     }
+
+    ~MyObjLoader();
 
     void Destroy()
     {

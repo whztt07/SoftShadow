@@ -69,6 +69,55 @@ HRESULT MyD3Ddevice::CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoin
 
 
 //--------------------------------------------------------------------------------------
+// Create backBuffer, depthStencil, view port
+//--------------------------------------------------------------------------------------
+HRESULT MyD3Ddevice::CreateBackBufferRes(uint32 width, uint32 height)
+{
+    HRESULT hr = S_OK;
+
+    // Create backbuffer render target view
+	ID3D11Texture2D* pBackBuffer = NULL;
+	hr = m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+	if (FAILED(hr))
+		return hr;
+
+	hr = m_pd3dDevice->CreateRenderTargetView(pBackBuffer, NULL, &m_pBackBufferRTV);
+	pBackBuffer->Release();
+	if (FAILED(hr))
+		return hr;
+
+    //Describe our Depth/Stencil Buffer
+	D3D11_TEXTURE2D_DESC depthStencilDesc;
+	depthStencilDesc.Width     = width;
+	depthStencilDesc.Height    = height;
+	depthStencilDesc.MipLevels = 1;
+	depthStencilDesc.ArraySize = 1;
+	depthStencilDesc.Format    = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilDesc.SampleDesc.Count   = 1;
+	depthStencilDesc.SampleDesc.Quality = 0;
+	depthStencilDesc.Usage          = D3D11_USAGE_DEFAULT;
+	depthStencilDesc.BindFlags      = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.CPUAccessFlags = 0; 
+	depthStencilDesc.MiscFlags      = 0;
+
+	//Create the default Depth/Stencil View
+	m_pd3dDevice->CreateTexture2D(&depthStencilDesc, NULL, &m_pBackBufferDS);
+	m_pd3dDevice->CreateDepthStencilView(m_pBackBufferDS, NULL, &m_pBackBufferDSV);
+
+	// Setup the default viewport
+	vp.Width = (FLOAT)width;
+	vp.Height = (FLOAT)height;
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 1.0f;
+	vp.TopLeftX = 0;
+	vp.TopLeftY = 0;
+
+    m_CameraView.ArcBall.setBounds((FLOAT)width, (FLOAT)height);
+
+    return S_OK;
+}
+
+//--------------------------------------------------------------------------------------
 // Create Direct3D device and swap chain
 //--------------------------------------------------------------------------------------
 HRESULT MyD3Ddevice::InitDevice(HWND g_hWnd)
@@ -126,43 +175,8 @@ HRESULT MyD3Ddevice::InitDevice(HWND g_hWnd)
 	if (FAILED(hr))
 		return hr;
 
-	// Create backbuffer render target view
-	ID3D11Texture2D* pBackBuffer = NULL;
-	hr = m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
-	if (FAILED(hr))
-		return hr;
-
-	hr = m_pd3dDevice->CreateRenderTargetView(pBackBuffer, NULL, &m_pBackBufferRTV);
-	pBackBuffer->Release();
-	if (FAILED(hr))
-		return hr;
-
-    //Describe our Depth/Stencil Buffer
-	D3D11_TEXTURE2D_DESC depthStencilDesc;
-
-	depthStencilDesc.Width     = width;
-	depthStencilDesc.Height    = height;
-	depthStencilDesc.MipLevels = 1;
-	depthStencilDesc.ArraySize = 1;
-	depthStencilDesc.Format    = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilDesc.SampleDesc.Count   = 1;
-	depthStencilDesc.SampleDesc.Quality = 0;
-	depthStencilDesc.Usage          = D3D11_USAGE_DEFAULT;
-	depthStencilDesc.BindFlags      = D3D11_BIND_DEPTH_STENCIL;
-	depthStencilDesc.CPUAccessFlags = 0; 
-	depthStencilDesc.MiscFlags      = 0;
-
-	//Create the default Depth/Stencil View
-	m_pd3dDevice->CreateTexture2D(&depthStencilDesc, NULL, &m_pBackBufferDS);
-	m_pd3dDevice->CreateDepthStencilView(m_pBackBufferDS, NULL, &m_pBackBufferDSV);
-
-	// Setup the default viewport
-	vp.Width = (FLOAT)width;
-	vp.Height = (FLOAT)height;
-	vp.MinDepth = 0.0f;
-	vp.MaxDepth = 1.0f;
-	vp.TopLeftX = 0;
-	vp.TopLeftY = 0;
+    // Create back buffer related resources
+    hr = CreateBackBufferRes(width, height);
 
     LPWSTR file = new WCHAR[MAX_PATH];
     LPWSTR path = new WCHAR[MAX_PATH];
@@ -243,6 +257,13 @@ HRESULT MyD3Ddevice::InitDevice(HWND g_hWnd)
 	cmdesc.CullMode = D3D11_CULL_NONE;
 	hr = m_pd3dDevice->CreateRasterizerState(&cmdesc, &m_pRSCullMode[RS_CULL_NONE]);
 
+    // Setup the default camera's view parameters
+    XMVECTOR vecEye = XMVectorSet( 0.0f, 1.0f,-5.0f, 1.0f );
+    XMVECTOR vecAt  = XMVectorSet( 0.0f, 0.0f, 0.0f, 1.0f );
+    XMVECTOR vecUp  = XMVectorSet( 0.0f, 5.0f, 1.0f, 1.0f );
+    m_CameraView.SetViewParams( &vecEye, &vecAt, &vecUp );
+    m_CameraView.SetProjParams( PI / 4.0f, (float)width/(float)height, 0.1f, 1000.0f );
+
 	return S_OK;
 }
 
@@ -272,6 +293,34 @@ void MyD3Ddevice::CleanupDevice()
     if (m_pRSCullMode[RS_CULL_CW])   m_pRSCullMode[RS_CULL_CW]->Release();
 
     if( m_pCBPerObjectBuffer ) m_pCBPerObjectBuffer->Release();
+}
+
+//--------------------------------------------------------------------------------------
+// Resize swap chain
+//--------------------------------------------------------------------------------------
+HRESULT MyD3Ddevice::SwapChinResize(uint32 width, uint32 height)
+{
+    HRESULT hr = S_OK;
+
+    if (m_pBackBufferRTV) m_pBackBufferRTV->Release();
+    if (m_pBackBufferDS) m_pBackBufferDS->Release();
+    if (m_pBackBufferDSV) m_pBackBufferDSV->Release();
+
+    if(m_pSwapChain)
+    {
+        m_pSwapChain->ResizeBuffers(1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+        hr = CreateBackBufferRes(width, height);
+    }
+
+    return hr;
+}
+
+//--------------------------------------------------------------------------------------
+// Release backbuffer
+//--------------------------------------------------------------------------------------
+void MyD3Ddevice::SwapChinRelease()
+{
+    // Release backbuffer related resources
 }
 
 //--------------------------------------------------------------------------------------
@@ -324,12 +373,12 @@ void MyD3Ddevice::RenderMesh()
 
 		    //Set the WVP matrix and send it to the constant buffer in effect file
 		    //WVP = meshWorld * camView * camProjection;
-		    //cbPerObj.WVP = XMMatrixTranspose(WVP);	
+            m_cbPerObj.WVP = m_CameraView.m_mView*m_CameraView.m_mProj;	
 		    //cbPerObj.World = XMMatrixTranspose(meshWorld);	
 		    //cbPerObj.difColor = material[meshSubsetTexture[i]].difColor;
 		    m_cbPerObj.hasTexture = ObjArray[i].material[idx].hasTexture;
 		    m_pImmediateContext->UpdateSubresource( m_pCBPerObjectBuffer, 0, NULL, &m_cbPerObj, 0, 0 );
-		    //m_pImmediateContext->VSSetConstantBuffers( 0, 1, &cbPerObjectBuffer );
+		    m_pImmediateContext->VSSetConstantBuffers( 0, 1, &m_pCBPerObjectBuffer );
 		    m_pImmediateContext->PSSetConstantBuffers( 0, 1, &m_pCBPerObjectBuffer );
             
 		    if(ObjArray[i].material[idx].hasTexture)

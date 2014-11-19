@@ -85,6 +85,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ArcBall.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="MyD3D11.cpp" />
     <ClCompile Include="MyD3Ddevice.cpp" />
     <ClCompile Include="MyObjLoader.cpp" />
@@ -93,6 +95,8 @@
     <ResourceCompile Include="MyD3D11.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ArcBall.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="MyD3Ddevice.h" />
     <ClInclude Include="MyObjLoader.h" />

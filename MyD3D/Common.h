@@ -15,6 +15,7 @@
 using namespace DirectX;
 
 #define MAX_PATH 260
+#define PI 3.141592654f
 
 typedef unsigned int uint32; 
 

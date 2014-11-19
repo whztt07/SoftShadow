@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "MyObjLoader.h"
+#include "Camera.h"
 
 typedef enum
 {
@@ -13,7 +14,7 @@ typedef enum
 //Create effects constant buffer's structure//
 struct cbPerObject
 {
-	//XMMATRIX  WVP;
+	XMMATRIX  WVP;
 	//XMMATRIX World;
 
 	///////////////**************new**************////////////////////
@@ -54,10 +55,15 @@ public:
 	~MyD3Ddevice();
 
 	HRESULT InitDevice(HWND g_hWnd);
+    HRESULT CreateBackBufferRes(uint32 width, uint32 height);
+    HRESULT CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob** ppBlobOut);
 	void CleanupDevice();
-	HRESULT CompileShaderFromFile(WCHAR* szFileName, LPCSTR szEntryPoint, LPCSTR szShaderModel, ID3DBlob** ppBlobOut);
-	void Render();
+    void SwapChinRelease();
+    HRESULT SwapChinResize(uint32 width, uint32 height);
+    void Render();
 
     std::vector<MyObjLoader> ObjArray; //array of obj models loaded
     void RenderMesh();
+
+    Camera m_CameraView;
 };

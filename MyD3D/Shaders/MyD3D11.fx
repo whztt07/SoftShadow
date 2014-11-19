@@ -7,7 +7,7 @@
 
 cbuffer cbPerObject
 {
-	//float4x4 WVP;
+	float4x4 WVP;
     //float4x4 World;
 
 	//float4 difColor;
@@ -31,7 +31,7 @@ VS_OUTPUT VS(float4 inPos : POSITION, float2 inTexCoord : TEXCOORD, float3 norma
 {
     VS_OUTPUT output;
 
-    output.Pos = inPos;//mul(inPos, WVP);
+    output.Pos = mul(inPos, WVP);
 	//output.worldPos = mul(inPos, World);
 
 	output.normal = normal;//mul(normal, World);

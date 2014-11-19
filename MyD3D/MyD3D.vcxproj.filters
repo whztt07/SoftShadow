@@ -16,6 +16,12 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{70cef453-79f0-4118-afbb-273bcb1df252}</UniqueIdentifier>
     </Filter>
+    <Filter Include="OBJLoader">
+      <UniqueIdentifier>{360ebe06-20c0-43af-b529-448d742d5b06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{c19b76fb-66aa-497f-a42c-8857c531ec8b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyD3D11.cpp">
@@ -25,7 +31,13 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MyObjLoader.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>OBJLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="ArcBall.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -44,7 +56,13 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MyObjLoader.h">
-      <Filter>Header Files</Filter>
+      <Filter>OBJLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="ArcBall.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

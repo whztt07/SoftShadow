@@ -129,6 +129,15 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
             hdc = BeginPaint( hWnd, &ps );
             EndPaint( hWnd, &ps );
             break;
+        case WM_SIZE:
+            switch (wParam)
+            {
+            case SIZE_MAXIMIZED:
+            case SIZE_RESTORED:
+                MyD3DRenderer.SwapChinRelease();
+                MyD3DRenderer.SwapChinResize(LOWORD(lParam), HIWORD(lParam));
+                break;
+            }
 		case WM_COMMAND:
 			switch (LOWORD(wParam))
 			{
@@ -163,7 +172,25 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
         case WM_DESTROY:
             PostQuitMessage( 0 );
             break;
-
+        // Mouse based messages for arcball
+        case WM_MOUSEMOVE:
+            MyD3DRenderer.m_CameraView.MousePt.s.X = (float)LOWORD(lParam);
+            MyD3DRenderer.m_CameraView.MousePt.s.Y = (float)HIWORD(lParam);
+            MyD3DRenderer.m_CameraView.isClicked   = (LOWORD(wParam) & MK_LBUTTON) ? true : false;
+            MyD3DRenderer.m_CameraView.isRClicked  = (LOWORD(wParam) & MK_RBUTTON) ? true : false;
+            break;
+        case WM_LBUTTONUP:
+            MyD3DRenderer.m_CameraView.isClicked   = false;
+            break;
+        case WM_RBUTTONUP:
+            MyD3DRenderer.m_CameraView.isRClicked  = false;
+            break;
+        case WM_LBUTTONDOWN:
+            MyD3DRenderer.m_CameraView.isClicked   = true;
+            break;
+        case WM_RBUTTONDOWN:
+            MyD3DRenderer.m_CameraView.isRClicked  = true;
+            break;
         default:
             return DefWindowProc( hWnd, message, wParam, lParam );
     }
